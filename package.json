@@ -1,0 +1,11 @@
+{
+  "name": "vending-nirl",
+  "version": "1.0.0",
+  "description": "a virtual vending machine (not in real life)",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose && exit 1"
+  },
+  "author": "Ian Hitchcock",
+  "license": "ISC"
+}
