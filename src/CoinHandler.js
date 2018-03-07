@@ -43,6 +43,28 @@ module.exports = class CoinHandler {
     )
       throw new Error(`Invalid input, to mimic a coin, pass in one of these strings 'nickel' , 'dime' , 'quarter' , 'loonie' , 'toonie'
     coin received was ${coin}`);
+    switch (coin) {
+      case "nickel": {
+        this.input.nickel += 1;
+        break;
+      }
+      case "dime": {
+        this.input.dime += 1;
+        break;
+      }
+      case "quarter": {
+        this.input.quarter += 1;
+        break;
+      }
+      case "loonie": {
+        this.input.loonie += 1;
+        break;
+      }
+      case "toonie": {
+        this.input.toonie += 1;
+        break;
+      }
+    }
   }
 
   makeSelection(id) {
@@ -59,21 +81,26 @@ module.exports = class CoinHandler {
       this.stock.toonie >= 500
     )
       throw new Error(`Machine needs servicing. please call 1-800-RESTOCK`);
-    if (!m.slot[id])
+    if (!this.m.slot[id])
       throw new Error("Invalid selection: no such selection exists.");
-    const slot = m.slot[id];
+    const slot = this.m.slot[id];
     if (slot.stock <= 0) throw new Error(`SLOT-${id}: Out of Stock`);
     const inputTotal = this.addCoins(this.input);
     if (slot.price > inputTotal)
       throw new Error(
-        `SLOT-${id}: Insuffient funds. Please add $${Number.toFixed(
-          (slot.price - inputTotal) / 100
-        )}`
+        `SLOT-${id}: Insuffient funds. Please add $${(
+          (slot.price - inputTotal) /
+          100
+        ).toFixed(2)}`
       );
     const change = inputTotal - slot.price;
     this.addInputToStock();
     const item = slot.dispense();
-    console.log(`Item from ${item} dispensed. Enjoy!`);
+    const changeCoins = this.dispenseChange(change);
+    console.log(
+      `Item from ${item} and $${(change / 100).toFixed(2)} dispensed. Enjoy!`
+    );
+    return { item, change: changeCoins };
   }
 
   addInputToStock() {
@@ -85,6 +112,14 @@ module.exports = class CoinHandler {
     this.emptyInput();
   }
 
+  subtractOutputFromStock(output) {
+    this.stock.nickel -= output.nickel;
+    this.stock.dime -= output.dime;
+    this.stock.quarter -= output.quarter;
+    this.stock.loonie -= output.loonie;
+    this.stock.toonie -= output.toonie;
+  }
+
   dispenseChange(change) {
     const output = {
       nickel: 0,
@@ -93,20 +128,21 @@ module.exports = class CoinHandler {
       loonie: 0,
       toonie: 0
     };
-    output.toonie = change / 200;
+    output.toonie = Math.floor(change / 200);
     change = change % 200;
-    output.loonie = change / 100;
+    output.loonie = Math.floor(change / 100);
     change = change % 100;
-    output.quarter = change / 25;
+    output.quarter = Math.floor(change / 25);
     change = change % 25;
-    output.dime = change / 10;
+    output.dime = Math.floor(change / 10);
     change = change % 10;
-    output.nickel = change / 5;
-    change = change % 5;
+    output.nickel = Math.floor(change / 5);
+    this.subtractOutputFromStock(output);
 
-    output = this.addCoins(output);
+    const addedOutput = this.addCoins(output);
 
-    console.log(`$${Number.toFixed(output / 100)} was returned.`);
+    console.log(`$${(addedOutput / 100).toFixed(2)} was returned.`);
+    return output;
   }
 
   addCoins(input) {
@@ -125,10 +161,17 @@ module.exports = class CoinHandler {
     this.input.loonie = 0;
     this.input.toonie = 0;
   }
+
   coinReturn() {
+    const change = { ...this.input };
     const input = this.addCoins(this.input);
     this.emptyInput();
-    console.log(`$${Number.toFixed(input / 100)} was returned.`);
+    console.log(`$${(input / 100).toFixed(2)} was returned.`);
+    return change;
+  }
+
+  getBalence() {
+    return this.addCoins(this.stock);
   }
   restock() {
     const stock = this.addCoins(this.stock);
@@ -141,7 +184,7 @@ module.exports = class CoinHandler {
 
     const newStock = this.addCoins(this.stock);
     console.log(
-      `💸💸💸$${Number.toFixed((stock - newStock) / 100)} was collected 💸💸💸`
+      `💸💸💸$${((stock - newStock) / 100).toFixed(2)} was collected 💸💸💸`
     );
   }
 };

@@ -15,7 +15,7 @@ module.exports = class ItemSlot {
       throw new Error(
         `SLOT-${this.id}: 
         Price must be in cents, divisible by 5 for payment in nickels, and between 0 and 350 cents. We are a reasonable vending machine company. 
-        newPrice had a value of ${newPrice}`
+        newPrice had a value of ${newPrice}  (${typeof newPrice})`
       );
     this.price = newPrice;
   }
@@ -24,11 +24,11 @@ module.exports = class ItemSlot {
   }
 
   addStock(stock) {
-    if (!Number.isInteger(newPrice) || stock < 0)
+    if (!Number.isInteger(stock) || stock < 0)
       throw new Error(
         `SLOT-${this.id}: 
         Stock must be a positive integer.
-        stock was ${stock}`
+        stock was ${stock} (${typeof stock})`
       );
     this.stock += stock;
     if (this.stock > 20) {
@@ -50,7 +50,7 @@ module.exports = class ItemSlot {
         `SLOT-${this.id}: 
       Out of stock. Please phone 1-800-RESTOCK and request a servicing`
       );
-    this.stock -= 1;
+    this.stock = this.stock - 1;
     return this.id;
   }
 };
