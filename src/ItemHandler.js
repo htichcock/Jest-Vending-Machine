@@ -1,3 +1,5 @@
+const ItemSlot = require("./ItemSlot.js");
+
 module.exports = class ItemHandler {
   constructor(rows, cols) {
     if (
