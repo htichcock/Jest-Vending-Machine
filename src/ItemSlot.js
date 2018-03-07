@@ -1,7 +1,7 @@
 module.exports = class ItemSlot {
   constructor(id) {
     this.price = 200; //$2 default
-    this.stock = 0; // 0 default
+    this.stock = 20; // 20 default
     this.id = id;
   }
 
@@ -41,6 +41,7 @@ module.exports = class ItemSlot {
 
   getStock() {
     console.log(`SLOT-${this.id}: ${this.stock} in stock`);
+    return this.stock;
   }
 
   dispense() {
